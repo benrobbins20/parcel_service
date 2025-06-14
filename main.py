@@ -68,11 +68,10 @@ def main():
         print(special_packages)
     # distribute_packages()
     
-    
     # instantiate trucks with packages loaded manually
-    truck1_packages = [1, 13, 14, 15, 16, 19, 20, 30, 31, 34, 37, 40]
-    truck2_packages = [3, 6, 12, 18, 22, 24, 25, 26, 27, 28, 29, 32, 35, 36, 38, 39]
-    truck3_packages = [2, 4, 5, 7, 8, 9, 10, 11, 17, 21, 23, 33]
+    truck1_packages = [1, 13, 14, 15, 16, 19, 20, 29, 30, 31, 34, 37, 40]
+    truck2_packages = [3, 6, 12, 18, 22, 25, 26, 27, 28, 32, 35, 36, 38, 39]
+    truck3_packages = [2, 4, 5, 7, 8, 9, 10, 11, 17, 21, 23, 24, 33]
     
     # Truck objects, initialize at the hub
     hub = ds.address_file[0][2]  # hub address from address file
@@ -80,6 +79,7 @@ def main():
     truck2 = TruckObject(truck_num=2, payload_capacity=1000, packages=truck2_packages, mileage_sum=0, cur_addr=hub)
     truck3 = TruckObject(truck_num=3, payload_capacity=1000, packages=truck3_packages, mileage_sum=0, cur_addr=hub)
     
+    # add_packages() takes a list of int:id and then appends package.id to truck.packages
     truck1.add_packages(truck1.packages)
     truck2.add_packages(truck2.packages)
     truck3.add_packages(truck3.packages)
@@ -94,9 +94,8 @@ def main():
         if len(pkg_set) == len(all_pkgs):
             print("Package distribution is valid.")
             return True
-
-        
-    # validate_package_distribution()
+    #################################
+    #validate_package_distribution()
     
     # specifying the type helps with language server completion 
     def negotiate_route(truck: TruckObject):
@@ -164,7 +163,7 @@ def main():
             pkg.departure_time = truck1.depart
             pkg.delivery_time = truck1.depart + pkg.base_time
             pkg.update_status("Delivered")
-            pkg.print_package_info()
+            #pkg.print_package_info()
             
         # after truck1 has completed its route, return to hub
         truck1_return_trip = calucate_distance(address_lookup(hub), address_lookup(truck1.cur_addr))
@@ -183,7 +182,7 @@ def main():
             pkg.departure_time = truck2.depart
             pkg.delivery_time = truck2.depart + pkg.base_time
             pkg.update_status("Delivered")
-            pkg.print_package_info()
+            #pkg.print_package_info()
             
         # return trip for truck2
         truck2_return_trip = calucate_distance(address_lookup(hub), address_lookup(truck2.cur_addr))
@@ -205,12 +204,19 @@ def main():
             pkg.departure_time = truck3.depart
             pkg.delivery_time = truck3.depart + pkg.base_time
             pkg.update_status("Delivered")
-            pkg.print_package_info()
-            
-        
-        
+            # pkg.print_package_info()
     ###################
     set_delivery_time()
+            
+    # test status and delivery time
+    now = timedelta(hours=10, minutes=30)  # current time for testing
+    for pkg_id in truck1.packages:
+        pkg = hash_table.lookup(pkg_id)
+        pkg.update_status(now)
+        pkg.print_package_info()
+        
+        
+    
     
         
         
