@@ -29,10 +29,8 @@ class DataSeries:
     # print the distance space delimited without Nones
     def print_distance_table(self):
         for row in self.distance_table:
-            for cell in row:
-                if cell is not None:
-                    print(cell, end = ' ')
-            print()
+            print("|".join(str(cell) if cell is not None else '' for cell in row))
+                
             
     def create_package_table(self):
         data = []

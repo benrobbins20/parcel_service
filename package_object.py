@@ -35,8 +35,16 @@ class PackageObject:
     def update_truck_num(self, truck_num):
         self.truck_num = truck_num
         
-    def update_status(self, status):
-        self.status = status
+    def update_status(self, time):
+        if time < self.departure_time:
+            self.status = "At hub"
+        elif (self.departure_time <= time < self.delivery_time):
+            self.status = "In Transit"
+        elif time >= self.delivery_time:
+            self.status = "Delivery"
+        else:
+            self.status = None
+        
         
     
     
