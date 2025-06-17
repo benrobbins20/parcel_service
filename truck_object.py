@@ -17,7 +17,7 @@ class TruckObject:
         print(f"{banner} TRUCK {self.truck_num} INFO {banner}")
         print(f"Average Speed: {self.avg_speed} mph")
         print(f"Packages on Truck: {self.packages}")
-        print(f"Departure Time: {self.depart}")
+        print(f"Departure: {self.depart} Delivery: {self.time} Return: {self.time + self.depart}")
         print(f"Total Mileage: {self.mileage_sum} miles")
         print(banner * 2)
         print("\n")

@@ -28,8 +28,11 @@ class DataSeries:
     
     # print the distance space delimited without Nones
     def print_distance_table(self):
+        print("\n\n")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DISTANCE TABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         for row in self.distance_table:
-            print("|".join(str(cell) if cell is not None else '' for cell in row))
+            row = [str(cell) for cell in row if cell is not None] # santize row to print clean table
+            print("|".join(row))
                 
             
     def create_package_table(self):
@@ -46,11 +49,13 @@ class DataSeries:
         self.package_file = data
 
     def print_package_table(self):
+        print("\n\n")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE TABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         for row in self.package_file:
             #print(" : ".join(row))  # join the elements with colons
             print(row)
             
-            
+    # EXTERNAL LIBARIES, why can't we just create envs for the evaluators?? :/
     # def generate_address_lookup(self):
     #     # single column A9:A35 of the distance table
     #     wb = openpyxl.load_workbook(self.dt_file_xl)
@@ -81,6 +86,8 @@ class DataSeries:
         self.address_file = data
         
     def print_address_table(self):
+        print("\n\n")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ADDRESS TABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         for row in self.address_file:
             # join the elements with colons
             print(" : ".join(row))
