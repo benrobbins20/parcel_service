@@ -99,6 +99,7 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     # after truck1 has completed its route, return to hub
     truck1_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck1.cur_addr))
     truck1.mileage_sum += truck1_return_trip
+    truck1.mileage_sum = round(truck1.mileage_sum, 1)  # clean float after all calculations complete
     truck1.time += timedelta(hours=truck1_return_trip / truck1.avg_speed)    
     
     # truck2 packages 6, 25, 28, 32 arrive at 9:05, can depart immediately at 9:05
@@ -113,6 +114,7 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     # return trip for truck2
     truck2_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck2.cur_addr))
     truck2.mileage_sum += truck2_return_trip
+    truck2.mileage_sum = round(truck2.mileage_sum, 1) 
     truck2.time += timedelta(hours=truck2_return_trip / truck2.avg_speed)
     
     # truck3 has the package(9) with the wrong address, set depart time to 10:20
@@ -126,8 +128,8 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     # return trip for truck3
     truck3_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck3.cur_addr))
     truck3.mileage_sum += truck3_return_trip
+    truck3.mileage_sum = round(truck3.mileage_sum, 1)
     truck3.time += timedelta(hours=truck3_return_trip / truck3.avg_speed)
-
 
 # set the package status based on the time, adjusting for the delayed packages and wrong address package
 def check_status(time: timedelta, hash_table: HashTable, truck1: TruckObject, truck2: TruckObject, truck3: TruckObject):
@@ -207,7 +209,7 @@ def main():
     print()    
     def user_menu(option):
         # check utility input as int
-        if option.isdigit() and int(option) in range(5):
+        if option.isdigit() and int(option) in range(7):
             option = int(option)
         if option == 1:
             ds.print_distance_table()
@@ -222,6 +224,28 @@ def main():
             truck1.print_truck_info()
             truck2.print_truck_info()
             truck3.print_truck_info()
+            print()
+        elif option == 5:
+            pkg_id = input("Enter package ID to lookup: ")
+            if pkg_id.isdigit():
+                pkg_id = int(pkg_id)
+                pkg = hash_table.lookup(pkg_id)
+                if pkg is not None:
+                    pkg.update_status(pkg.delivery_time) # set the status to delivered for the purpose of the lookup
+                    pkg.print_package_info()
+                else:
+                    print(f"Package ID {pkg_id} not found.")
+            else:
+                print("Invalid package ID. Please enter a number.")
+            print()
+        elif option == 6:
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MILEAGE CALCULATIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            total_mileage = truck1.mileage_sum + truck2.mileage_sum + truck3.mileage_sum
+            print(f"Truck 1 mileage including return trip ({truck1.cur_addr} -> {hub}): {truck1.mileage_sum} miles")
+            print(f"Truck 2 mileage including return trip ({truck2.cur_addr} -> {hub}): {truck2.mileage_sum} miles")
+            print(f"Truck 3 mileage including return trip ({truck3.cur_addr} -> {hub}): {truck3.mileage_sum} miles")
+            print()
+            print(f"Total mileage for all trucks: {total_mileage} miles")
             print()
         else:
             # validate time input with regex
@@ -238,16 +262,18 @@ def main():
                 print()
             # print_menu()
             
-            
     def print_menu():
-        print("\n\n")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILITIES %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        print("\n")
         print("Welcome to the WGUPS package lookup!")
-        print("Use the following utilities to view package itinerary and truck information:")
+        print("\n")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILITIES %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        print("Use the following utilities to view package and truck information:")
         print("1. View Distance Table")
         print("2. View Package Table")
         print("3. View Address Table")
         print("4. View Truck Information")
+        print("5. Package Lookup by ID")
+        print("6. View total total mileage for all trucks")
         print()
         print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE LOOKUP PORTAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         print("Enter a time in as HH:MM(AM/PM) to view all package information")
@@ -263,7 +289,7 @@ def main():
                 break
             user_menu(option)
         except ValueError:
-            print("Invalid input. Please enter a number between 0 and 4.")
+            print("Invalid input. Please enter a number between 0 and 5.")
     
 if __name__ == "__main__":
     main()
