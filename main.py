@@ -2,7 +2,7 @@ from data_series import DataSeries
 from truck_object import TruckObject
 from package_object import PackageObject
 from hash_table import HashTable
-import math
+import math, re
 from datetime import timedelta, time
 
 # load the hash table with PackageObjects
@@ -17,8 +17,8 @@ def load_hash_table(ds: DataSeries, hash_table: HashTable):
             deadline = package[5],
             weight = int(package[6]),
             note = package[7],
-            status = "At hub", # start with initial status,
-            truck_num=None  # no truck assigned initially
+            status = "At hub", # init "At hub"
+            truck_num = None # init None
         )
         hash_table.insert(package)
 
@@ -54,6 +54,7 @@ def negotiate_route(truck: TruckObject, hash_table:HashTable, ds:DataSeries): # 
     # print(f"packages before sorting by nearest distance: {truck.packages}")
     for pkg_id in truck.packages:
         pkg = hash_table.lookup(pkg_id) # retrives the PackageObject and place into left array
+        pkg.update_truck_num(truck.truck_num) 
         if pkg is not None:
             left.append(pkg)
     # the algorithm needs to reconstruct truck.packages list in the order of delivery
@@ -89,16 +90,11 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     
     # truck1 has (mostly) packages that need to be delivered by 10:30, set departure time to 8:00am
     # truck1 packages [1, 13, 14, 15, 16, 19, 20, 30, 31, 34, 37, 40]
-    #print("\n")
-    #print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 1 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     truck1.depart = timedelta(hours=8)
-    #print(f"truck 1 base: {truck1.time}")
-    #print(f"truck 1 depart: {truck1.depart}")
     for pkg in truck1.packages:
         pkg = hash_table.lookup(pkg)
         pkg.departure_time = truck1.depart
         pkg.delivery_time = truck1.depart + pkg.base_time
-        #pkg.print_package_info()
         
     # after truck1 has completed its route, return to hub
     truck1_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck1.cur_addr))
@@ -108,58 +104,70 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     # truck2 packages 6, 25, 28, 32 arrive at 9:05, can depart immediately at 9:05
     # packages 3, 18, 36, 38 must be on truck 2
     # truck2 packages [3, 6, 12, 22, 24, 25, 26, 27, 28, 29, 32, 35, 36, 38, 39]
-    #print("\n")
-    #print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 2 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     truck2.depart = timedelta(hours=9, minutes=5)
-    #print(f"truck 2 base: {truck2.time}")
-    #print(f"truck 2 depart: {truck2.depart}")
     for pkg in truck2.packages:
         pkg = hash_table.lookup(pkg)
         pkg.departure_time = truck2.depart
         pkg.delivery_time = truck2.depart + pkg.base_time
-        #pkg.print_package_info()
-        
+
     # return trip for truck2
     truck2_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck2.cur_addr))
     truck2.mileage_sum += truck2_return_trip
     truck2.time += timedelta(hours=truck2_return_trip / truck2.avg_speed)
     
-    
     # truck3 has the package(9) with the wrong address, set depart time to 10:20
     # truck3 packages [2, 4, 5, 7, 8, 9, 10, 11, 17, 18, 21, 23, 33]
-    #print("\n")
-    #print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 3 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     truck3.depart = timedelta(hours=10, minutes=20)
-    # print(f"truck 3 base: {truck3.time}")
-    # print(f"truck 3 depart: {truck3.depart}")
     for pkg in truck3.packages:
         pkg = hash_table.lookup(pkg)
         pkg.departure_time = truck3.depart
         pkg.delivery_time = truck3.depart + pkg.base_time
-        # pkg.print_package_info()
         
     # return trip for truck3
     truck3_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck3.cur_addr))
     truck3.mileage_sum += truck3_return_trip
     truck3.time += timedelta(hours=truck3_return_trip / truck3.avg_speed)
-###################
 
-# set the package status based on the time
+
+# set the package status based on the time, adjusting for the delayed packages and wrong address package
 def check_status(time: timedelta, hash_table: HashTable, truck1: TruckObject, truck2: TruckObject, truck3: TruckObject):
+    print(f"Checking package status at {time}")
+    print("\n")
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 1 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(f"Truck 1 Departure time: {truck1.depart}")
     for pkg_id in truck1.packages:
         pkg = hash_table.lookup(pkg_id)
         pkg.update_status(time)
-        pkg.print_package_info()
-    
+        pkg.print_package_info_brief(time)
+        
+    print("\n")
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 2 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(f"Truck 2 Departure time: {truck2.depart}")
     for pkg_id in truck2.packages:
         pkg = hash_table.lookup(pkg_id)
-        pkg.update_status(time)
-        pkg.print_package_info()
-    
+        # truck 2 has the delayed packages # 6, 25, 28, 32, manually set the status
+        if pkg_id in [6, 25, 28, 32]:
+            if time < truck2.depart:
+                pkg.status = "Delayed"
+            else:
+                pkg.update_status(time)
+        else:
+            pkg.update_status(time)
+        pkg.print_package_info_brief(time)
+        
+    print("\n")
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRUCK 3 INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(f"Truck 3 Departure time: {truck3.depart}")
     for pkg_id in truck3.packages:
         pkg = hash_table.lookup(pkg_id)
+        # truck 3 has the wrong address package # 9, manually set the address ATTRIBUTE, the CSV contains the correct address
+        if pkg_id == 9:
+            if time < truck3.depart:
+                pkg.address = "300 State St"
+            else:
+                pkg.address = "410 S State St"
         pkg.update_status(time)
-        pkg.print_package_info()
+        pkg.print_package_info_brief(time)
 
 def main():
 
@@ -196,45 +204,64 @@ def main():
     # set the delivery times
     set_delivery_time(ds, hash_table, truck1, truck2, truck3, hub)
     
-            
-    def utility_menu(option: int):
+    print()    
+    def user_menu(option):
+        # check utility input as int
+        if option.isdigit() and int(option) in range(5):
+            option = int(option)
         if option == 1:
             ds.print_distance_table()
-            #print_menu()
+            print()
         elif option == 2:
             ds.print_package_table()
-            #print_menu()
+            print()
         elif option == 3:
             ds.print_address_table()
-            #print_menu()
+            print()
         elif option == 4:
             truck1.print_truck_info()
             truck2.print_truck_info()
             truck3.print_truck_info()
-            #print_menu()
-        else:
-            print("Invalid option. Please try again.")
             print()
+        else:
+            # validate time input with regex
+            pattern = r'^(0?[1-9]|1[0-2]):([0-5][0-9])(AM|PM|am|pm)$' # matches 09:00AM, 9:00PM, 12:30am, etc
+            if re.match(pattern, option):
+                groups = re.match(pattern, option).groups()
+                input_time = timedelta(hours=int(groups[0]), minutes=int(groups[1]))
+                # if in the afernoon, time = time + 12
+                if groups[2].lower() == 'pm' and int(groups[0]) != 12:
+                    input_time += timedelta(hours=12)
+                check_status(input_time, hash_table, truck1, truck2, truck3)
+            else:
+                print("Invalid option. Please try again.")
+                print()
             # print_menu()
+            
+            
     def print_menu():
+        print("\n\n")
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTILITIES %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         print("Welcome to the WGUPS package lookup!")
         print("Use the following utilities to view package itinerary and truck information:")
         print("1. View Distance Table")
         print("2. View Package Table")
         print("3. View Address Table")
         print("4. View Truck Information")
-    
+        print()
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE LOOKUP PORTAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        print("Enter a time in as HH:MM(AM/PM) to view all package information")
+
     
     # start main cli functionality 
     while True:
-
         try:
             print_menu()
-            option = int(input("Enter an option (1-4) or 0 to exit: "))
+            option = input("User Input: ")
             if option == 0:
                 print("Exiting the program. Goodbye!")
                 break
-            utility_menu(option)
+            user_menu(option)
         except ValueError:
             print("Invalid input. Please enter a number between 0 and 4.")
     

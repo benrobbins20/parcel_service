@@ -1,5 +1,5 @@
 class PackageObject:
-    def __init__(self, id, address, city, state, zip_code, deadline, weight, note, status, truck_num=None):
+    def __init__(self, id, address, city, state, zip_code, deadline, weight, note, status, truck_num):
         self.id = id
         self.address = address
         self.city = city
@@ -31,6 +31,17 @@ class PackageObject:
         print(banner * 2)
         print("\n")
         
+    # need a oneliner print method for package info
+    def print_package_info_brief(self, time):
+        if time < self.departure_time:
+            print(f"Package ID: {self.id}, Address: {self.address}, Status: {self.status}")
+        elif (self.departure_time <= time < self.delivery_time):
+            print(f"Package ID: {self.id}, Address: {self.address}, Status: {self.status}, Estimated Delivery: {self.delivery_time}")
+        elif time >= self.delivery_time:
+            print(f"Package ID: {self.id}, Address: {self.address}, Status: {self.status}, Delivered at: {self.delivery_time}")
+            
+
+        
         
     def update_truck_num(self, truck_num):
         self.truck_num = truck_num
@@ -41,11 +52,7 @@ class PackageObject:
         elif (self.departure_time <= time < self.delivery_time):
             self.status = "In Transit"
         elif time >= self.delivery_time:
-            self.status = "Delivery"
-        else:
-            self.status = None
-        
-        
+            self.status = "Delivered"
     
     
         
