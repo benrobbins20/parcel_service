@@ -29,7 +29,7 @@ def address_lookup(ds:DataSeries, address):
             return int(row[0])
 
 # distance between locations
-def calucate_distance(ds:DataSeries, row, col):
+def calculate_distance(ds:DataSeries, row, col):
     # the table is symmetric, so if one result is None because cell is empty, access distance with the alternate index
     distance_rc = ds.distance_table[row][col]
     distance_cr = ds.distance_table[col][row]
@@ -69,8 +69,8 @@ def negotiate_route(truck: TruckObject, hash_table:HashTable, ds:DataSeries): # 
         next_package = None
         for pkg in left:
             # calculate address works like [row][col], so find the package in the row, then scroll over to truck location
-            if calucate_distance(ds, address_lookup(ds, pkg.address), address_lookup(ds, truck.cur_addr)) <= next_address:
-                next_address = calucate_distance(ds, address_lookup(ds, pkg.address), address_lookup(ds, truck.cur_addr))
+            if calculate_distance(ds, address_lookup(ds, pkg.address), address_lookup(ds, truck.cur_addr)) <= next_address:
+                next_address = calculate_distance(ds, address_lookup(ds, pkg.address), address_lookup(ds, truck.cur_addr))
                 next_package = pkg
             
         # add pkg to truck.packages and then remove from left to exhaust the while loop
@@ -97,7 +97,7 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
         pkg.delivery_time = truck1.depart + pkg.base_time
         
     # after truck1 has completed its route, return to hub
-    truck1_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck1.cur_addr))
+    truck1_return_trip = calculate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck1.cur_addr))
     truck1.mileage_sum += truck1_return_trip
     truck1.mileage_sum = round(truck1.mileage_sum, 1)  # clean float after all calculations complete
     truck1.time += timedelta(hours=truck1_return_trip / truck1.avg_speed)    
@@ -112,7 +112,7 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
         pkg.delivery_time = truck2.depart + pkg.base_time
 
     # return trip for truck2
-    truck2_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck2.cur_addr))
+    truck2_return_trip = calculate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck2.cur_addr))
     truck2.mileage_sum += truck2_return_trip
     truck2.mileage_sum = round(truck2.mileage_sum, 1) 
     truck2.time += timedelta(hours=truck2_return_trip / truck2.avg_speed)
@@ -126,7 +126,7 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
         pkg.delivery_time = truck3.depart + pkg.base_time
         
     # return trip for truck3
-    truck3_return_trip = calucate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck3.cur_addr))
+    truck3_return_trip = calculate_distance(ds, address_lookup(ds, hub), address_lookup(ds, truck3.cur_addr))
     truck3.mileage_sum += truck3_return_trip
     truck3.mileage_sum = round(truck3.mileage_sum, 1)
     truck3.time += timedelta(hours=truck3_return_trip / truck3.avg_speed)
