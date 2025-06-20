@@ -62,6 +62,17 @@ fn lookup(id)
 ### Summary of Hashmap lookup() runtime complexity
 #### The lookup function has a worst case runtime complexity of O(K) from iterating over bucket items. However, in practice, the average case is O(1) because the hashmap is designed to have no collisions with unique ID's for 50 packages. 
 
-### C2:
+### C2: Hardware and Software Specifications
+#### Python 3.13.3 running on MacOS 15
+### C3: 
 #### Nearest Neighbor Algorithm: O(N^2)
 #### Hashmap lookup: O(K) 
+### C4:
+#### Both the nearest neighbor algorithm and the hashmap lookup function are self-adjusting algorithms. Packages can be added to the algorithm with the ability to handle collisions in the hashmap as well as extending and negotiating the route due to the nature of the nearest neighbor algorithm. The order of delivery will always be adjusted based on the current location of the vehicle and the remaining packages to deliver.
+### C5: Maintenance and Efficiency
+#### Once the algorithm is in place, very little maintenance is required. Simply adding packages to the truck will automatically adjust the route as the nearest drop off location is recalculated. The algorithm is modular and object based, therefore it can easily be integrated into a larger system if needed. 
+### C6: Weighing the Pros and Cons of the Self-Adjusting Algorithm
+#### The nearest neighbor algorithm is a simple and effective way to sort packages by distance. It is easy to implement and understand, making it a good choice for a package delivery service. However, it does not always produce the optimal route, and it can be slow for large numbers of packages. Nearest neighbor is a greedy algorithm, meaning it very much considers only the next step, rather than a holistic view of the entire route. A shortest path algorithm such as Dijkstra's or 'A-Star' would be more efficient for larger numbers of packages. Overall, nearest neighbor is a good choice for this delivery scheme and satifies the delivery requirements for WGUPS.
+#### The hashmap lookup function is also simple and effective. With an appropriately sized hashmap, the lookup function resolves a key/index that exists in the map, and only finds a bucket with 1 item, creating a very fast retrieval efficiency. It can be slow if there are many collisions as the lookup function may need to iterate over ALL of the items in the bucket to find a match.
+### C7: Hashmap Key
+#### The unique package ID is the obvious choice for a lookup key. For hashmap of size 50, ID's 1 and 51 can resolve to the same bucket, as the hashing function is simply a modulus of the ID by the size of the hashmap. eg. $51 \bmod 50 = 1$
