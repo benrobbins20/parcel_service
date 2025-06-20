@@ -43,23 +43,25 @@ fn negotiate_route()
         # advance the truck's current location
         current_location = nearest_package.location
         # repeat while loop, overwrites nearest package/distance
-        # (N) + (N-1) + (N-2) ... N times
 ```
-#### The hashmap lookup function leverages "chaining" to resolve collisions. The program is designed with ample room to handle 40 packages, so no collisions are expected. However, for expandability, each bucket stores an array of PackageObjects, identified by a unique package ID.
+###  Summary of Nearest Neighbor / TSP runtime complexity
+#### The runtime complexity of the nearest neighbor alogirithm follows the pattern (N) + (N-1) + (N-2) ... N times, which resolves to the arithmatic sequence $N(N-1)/2$. The total algorithm equals $O(N) + O(N^2)$, the larger term dominates the runtime complexity, so the overall complexity is $O(N^2)$.
+
+#### The hashmap leverages "chaining" to resolve collisions. The hashmap is designed with ample room to handle 40 packages with a default size of 50, so no collisions are expected. However, for expandability, each bucket stores an array of PackageObjects, identified by a unique package ID. While the insert() function runs at O(1), the lookup() function has the possilibilty of running at O(K) due to chaining 
 ```
+fn lookup(id)
+    key = id % hash table size
+    bucket = hash_table[key]
+    for package in bucket
+        if package.id == id
+            # found, worst case O(K), where K = number of packages in bucket
+            return package 
+    return None # package not found
 
 ```
+### Summary of Hashmap lookup() runtime complexity
+#### The lookup function has a worst case runtime complexity of O(K) from iterating over bucket items. However, in practice, the average case is O(1) because the hashmap is designed to have no collisions with unique ID's for 50 packages. 
 
-
-
-latex
-
-The formula is $n(n - 1)/2$.
-
-$x^2 + y^2 = z^2$
-$$
-\sum_{i=1}^{n} i = \frac{n(n+1)}{2}
-$$
-$$
-\sqrt{16} = 4
-$$
+### C2:
+#### Nearest Neighbor Algorithm: O(N^2)
+#### Hashmap lookup: O(K) 
