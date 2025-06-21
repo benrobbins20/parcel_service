@@ -5,6 +5,16 @@ from hash_table import HashTable
 import math, re
 from datetime import timedelta, time
 
+##############################################################
+# Ben Robbins SID: 011007860
+# WGUPS Package Delivery System using the Nearest Neighbor Algorithm and package storage in a Hash Table
+#  _       __________  ______  _____
+# | |     / / ____/ / / / __ \/ ___/
+# | | /| / / / __/ / / / /_/ /\__ \ 
+# | |/ |/ / /_/ / /_/ / ____/___/ / 
+# |__/|__/\____/\____/_/    /____/  
+                                  
+
 # load the hash table with PackageObjects
 def load_hash_table(ds: DataSeries, hash_table: HashTable):
     for package in ds.package_file:
@@ -173,7 +183,7 @@ def check_status(time: timedelta, hash_table: HashTable, truck1: TruckObject, tr
 
 def main():
 
-    # instanciate a data series object and call methods to populate the tables
+    # instantiate a data series object and call methods to populate the tables
     ds = DataSeries()
     ds.create_distance_table()
     ds.create_package_table()
