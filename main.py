@@ -16,6 +16,7 @@ from datetime import timedelta, time
                                   
 
 # load the hash table with PackageObjects
+# time and space complexity O(N)
 def load_hash_table(ds: DataSeries, hash_table: HashTable):
     for package in ds.package_file:
         package = PackageObject(
@@ -33,12 +34,15 @@ def load_hash_table(ds: DataSeries, hash_table: HashTable):
         hash_table.insert(package)
 
 # loop through address table and retrive the index to cross reference distance table
+# time complexity O(N)
+# space complexity O(1), no data stored
 def address_lookup(ds:DataSeries, address):
     for row in ds.address_file:
         if address in row[2]:
             return int(row[0])
 
 # distance between locations
+# time and space complexity O(1)
 def calculate_distance(ds:DataSeries, row, col):
     # the table is symmetric, so if one result is None because cell is empty, access distance with the alternate index
     distance_rc = ds.distance_table[row][col]
@@ -58,6 +62,8 @@ def validate_package_distribution(all_pkgs) -> bool:
 #validate_package_distribution()
 
 # nearest neighbor algorithm to sort packages by distance
+# N(N-1)/2 -> O(N^2) time complexity
+# N packages split between two internal data structures -> space complexity O(N)
 def negotiate_route(truck: TruckObject, hash_table:HashTable, ds:DataSeries): # specifying the type helps with language server completion 
     # truck.packages has array of packages, mileage starts at 0
     left = [] # left to deliver
@@ -95,7 +101,8 @@ def negotiate_route(truck: TruckObject, hash_table:HashTable, ds:DataSeries): # 
         truck.time += timedelta(hours=next_address / truck.avg_speed)
         next_package.base_time = truck.time
 
-
+# time complexity services all 40 packages for route, split between 3 trucks O(N1+N2+N3) -> Time Complexity O(N)
+# 
 def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject, truck2: TruckObject, truck3: TruckObject, hub: str):
     
     # truck1 has (mostly) packages that need to be delivered by 10:30, set departure time to 8:00am
