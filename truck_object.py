@@ -12,9 +12,6 @@ class TruckObject:
         # attribute for truck departure time
         self.time = depart
         
-    @property
-    def mileage(self):
-        return round(self.mileage_sum, 1)
     
     def print_truck_info(self):
         banner = "%" * 20 

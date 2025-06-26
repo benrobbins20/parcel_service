@@ -63,10 +63,28 @@ fn lookup(id)
 #### The lookup function has a worst case runtime complexity of O(K) from iterating over bucket items. However, in practice, the average case is O(1) because the hash map is designed to have no collisions with unique ID's for 50 packages. 
 
 ### C2: Hardware and Software Specifications
-#### Python 3.13.3 running on MacOS 15
-### C3: 
+#### Python Version: Python 3.13.3
+#### Hardware Overview
+
+- **Model Name:** MacBook Pro
+- **Model Identifier:** MacBookPro18,1
+- **Model Number:** Z14W00105LL/A
+- **Chip:** Apple M1 Pro
+- **Total Number of Cores:** 10 (8 performance, 2 efficiency)
+- **Memory:** 32 GB
+- **System Firmware Version:** 11881.121.1
+- **OS Loader Version:** 11881.121.1
+
+### C3: Detailed runtime complexity
+- **Hash map insert:** O(1) time and space complexity, the function itself does not contain and expandable data structure that grows with input, the insert method simple places item in chain of items which is a constant time operation.
+- **Hash map update/lookup:** Due to chaining, the methods operate with an O(N) time complexity. In the astomically rare scenario that all packages resolve to the same bucket index, looping through all items would produce worst case scenario linear runtime complexity. (eg. 1, 51, 101, 151, etc) 
+- **Data Series creation:** O(N), all items take a list of N items in the included tables and then creates a new python 2D array of N items.
+- **Truck add_packages:** O(N), when the truck classes are instantiated, the add_packages method takes a list of N items and then adds them to the truck's package list.
+- **Nearest Neighbor Algorithm:** O(N^2), the algorithm iterates over the list of packages N times, and for each package, it calculates the distance to every other package, resulting in a quadratic time complexity. As packages are removed and added to local arrays for sorting, space cmplexity remains at O(N). 
+- **Total runtime complexity of the program:** The dominating factor is the nearest neighbor sorting algorithm. All of the additional methods produce no compounding data structures that grow with input, therefore the holitic space complexity remains O(N) and the overall runtime complexity is O(N^2).
 #### Nearest Neighbor Algorithm: O(N^2)
-#### hash map lookup: O(K) 
+#### hash map lookup: O(K) -> O(N)
+
 ### C4:
 #### Both the nearest neighbor algorithm and the hash map lookup function are self-adjusting algorithms. Packages can be added to the algorithm with the ability to handle collisions in the hash map as well as extending and negotiating the route due to the nature of the nearest neighbor algorithm. The order of delivery will always be adjusted based on the current location of the vehicle and the remaining packages left to deliver.
 ### C5: Maintenance and Efficiency

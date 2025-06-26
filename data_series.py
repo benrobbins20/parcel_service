@@ -34,7 +34,7 @@ class DataSeries:
             row = [str(cell) for cell in row if cell is not None] # santize row to print clean table
             print("|".join(row))
                 
-            
+    # 
     def create_package_table(self):
         data = []
         with open(self.pkg_file, 'r', encoding='utf-8-sig', newline='') as file:

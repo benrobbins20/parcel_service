@@ -10,7 +10,9 @@ class HashTable:
     # there will be no collisions for the base project, but retain the capability for bucket chaining
     def key(self, pkg_id):
         return int(pkg_id) % len(self.table)
-        
+    
+    # insert is O(1), even if there is a collision, it just appends to the bucket which is a constant time operation
+    # method is O(1) space complexity, it doesn't hold any data structures that grow with input
     def insert(self,pkg_object):
         if not isinstance(pkg_object, PackageObject):
             raise TypeError("parameter must be of type PackageObject")
@@ -28,6 +30,8 @@ class HashTable:
             
         return
     
+    # space complexity O(1), requires no growing data structures
+    # in the rare event that every package maps to the same hash map bucket, it would result in O(N) time complexity
     def update(self, pkg_object):
         # exit if wrong type 
         if not isinstance(pkg_object, PackageObject):
@@ -49,6 +53,7 @@ class HashTable:
         return
         
     # only need the id, the PackageObject is returned
+    # O(N) -> package id's 1,51,101... it would be improbable...
     def lookup(self, id) -> PackageObject:
         index = self.key(id)
         bucket = self.table[index]

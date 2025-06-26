@@ -51,6 +51,8 @@ def calculate_distance(ds:DataSeries, row, col):
 
 # random test in the middle of my main.py..... legit
 # validate distribution of packages is correct by comparing length of set() to a list of all currently assigned packages
+# time complexity O(N)
+# space complexity 0(N)
 def validate_package_distribution(all_pkgs) -> bool:
     pkg_set = set()
     for pkg in all_pkgs:
@@ -101,8 +103,9 @@ def negotiate_route(truck: TruckObject, hash_table:HashTable, ds:DataSeries): # 
         truck.time += timedelta(hours=next_address / truck.avg_speed)
         next_package.base_time = truck.time
 
+# use the baseline time to set the delivery times for each truck
 # time complexity services all 40 packages for route, split between 3 trucks O(N1+N2+N3) -> Time Complexity O(N)
-# 
+# No growing data structures, space complexity O(1)
 def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject, truck2: TruckObject, truck3: TruckObject, hub: str):
     
     # truck1 has (mostly) packages that need to be delivered by 10:30, set departure time to 8:00am
@@ -149,6 +152,8 @@ def set_delivery_time(ds:DataSeries, hash_table: HashTable, truck1: TruckObject,
     truck3.time += timedelta(hours=truck3_return_trip / truck3.avg_speed)
 
 # set the package status based on the time, adjusting for the delayed packages and wrong address package
+# space O(1)
+# time O(N), simple linear data assignment
 def check_status(time: timedelta, hash_table: HashTable, truck1: TruckObject, truck2: TruckObject, truck3: TruckObject):
     print(f"Checking package status at {time}")
     print("\n")
@@ -306,7 +311,7 @@ def main():
                 break
             user_menu(option)
         except ValueError:
-            print("Invalid input. Please enter a number between 0 and 5.")
+            print("Invalid input. Please enter a number between 1 and 6.")
     
 if __name__ == "__main__":
     main()
