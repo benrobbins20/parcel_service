@@ -271,7 +271,6 @@ def main():
             print()
         elif option == 7:
             print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE DEADLINE INFORMATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            print("Packages with deadlines:")
             for pkg_id in truck1.packages + truck2.packages + truck3.packages:
                 pkg = hash_table.lookup(pkg_id)
                 note = pkg.note if pkg.note else "No Note"
