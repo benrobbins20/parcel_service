@@ -2,7 +2,7 @@ from data_series import DataSeries
 from truck_object import TruckObject
 from package_object import PackageObject
 from hash_table import HashTable
-import math, re
+import math, re, sys
 from datetime import timedelta, time
 
 ##############################################################
@@ -231,7 +231,7 @@ def main():
     print()    
     def user_menu(option):
         # check utility input as int
-        if option.isdigit() and int(option) in range(7):
+        if option.isdigit() and int(option) in range(8):
             option = int(option)
         if option == 1:
             ds.print_distance_table()
@@ -269,6 +269,16 @@ def main():
             print()
             print(f"Total mileage for all trucks: {total_mileage} miles")
             print()
+        elif option == 7:
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE DEADLINE INFORMATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            print("Packages with deadlines:")
+            for pkg_id in truck1.packages + truck2.packages + truck3.packages:
+                pkg = hash_table.lookup(pkg_id)
+                note = pkg.note if pkg.note else "No Note"
+                print(f"Package ID: {pkg.id}, Deadline: {pkg.deadline}, Address: {pkg.address}, Note: {note}")
+        elif option == 0:
+            print("Exiting the program. Goodbye!")
+            sys.exit(0)
         else:
             # validate time input with regex
             pattern = r'^(0?[1-9]|1[0-2]):([0-5][0-9])(AM|PM|am|pm)$' # matches 09:00AM, 9:00PM, 12:30am, etc
@@ -294,8 +304,10 @@ def main():
         print("2. View Package Table")
         print("3. View Address Table")
         print("4. View Truck Information")
-        print("5. Package Lookup by ID")
+        print("5. View Package by ID")
         print("6. View total total mileage for all trucks")
+        print("7. View Package Deadline Information")
+        print("0. Exit the program")
         print()
         print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE LOOKUP PORTAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         print("Enter a time in as HH:MM(AM/PM) to view all package information")
@@ -311,7 +323,7 @@ def main():
                 break
             user_menu(option)
         except ValueError:
-            print("Invalid input. Please enter a number between 1 and 6.")
+            print("Invalid input. Please enter a number between 1 and 7.")
     
 if __name__ == "__main__":
     main()
